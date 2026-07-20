@@ -1,10 +1,19 @@
 package main
 
 import (
+	"fmt"
+
+	"github.com/Shauryan10/GoFlow/config"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+
+	cfg := config.LoadConfig()
+
+	fmt.Println("Database Host :", cfg.DBHost)
+	fmt.Println("Database Port :", cfg.DBPort)
+	fmt.Println("Application Port :", cfg.AppPort)
 
 	router := gin.Default()
 
@@ -14,5 +23,5 @@ func main() {
 		})
 	})
 
-	router.Run(":8080")
+	router.Run(":" + cfg.AppPort)
 }
