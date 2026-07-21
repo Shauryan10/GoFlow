@@ -5,6 +5,9 @@ import (
 	"log"
 
 	"github.com/Shauryan10/GoFlow/config"
+	"github.com/Shauryan10/GoFlow/internal/models"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
@@ -23,10 +26,17 @@ func ConnectDatabase(cfg *config.Config) {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
-		log.Fatal("Failed to connect database")
+		log.Fatal("Failed to connect database", err)
 	}
 
 	DB = db
+	err = DB.AutoMigrate(&models.Task{})
 
-	fmt.Println("Connected to PostgreSQL")
+	if err != nil {
+		log.Fatal("Migration failed:", err)
+	}
+
+	fmt.Println("Database connected successfully!")
+	fmt.Println("Tasks table migrated successfully!")
+
 }
