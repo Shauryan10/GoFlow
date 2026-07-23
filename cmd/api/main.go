@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Shauryan10/GoFlow/config"
+	"github.com/Shauryan10/GoFlow/internal/api"
 	database "github.com/Shauryan10/GoFlow/internal/databases"
 	"github.com/gin-gonic/gin"
 )
@@ -11,19 +12,19 @@ import (
 func main() {
 
 	cfg := config.LoadConfig()
-	database.ConnectDatabase(cfg)
 
 	fmt.Println("Database Host :", cfg.DBHost)
 	fmt.Println("Database Port :", cfg.DBPort)
 	fmt.Println("Application Port :", cfg.AppPort)
 
-	router := gin.Default()
+	database.ConnectDatabase(cfg) //connecting to postgres
 
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "GoFlow API Running",
-		})
-	})
+	router := gin.Default() //creating gin router
 
+	// Register all API routes
+	api.RegisterRoutes(router)
+
+	fmt.Println("🚀 GoFlow API is running on port", cfg.AppPort)
 	router.Run(":" + cfg.AppPort)
+	
 }
