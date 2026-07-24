@@ -48,3 +48,8 @@ func CreateTask(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, response)
 }
+
+func GetTasks(c *gin.Context) {
+	var tasks []models.Task
+	
+}
