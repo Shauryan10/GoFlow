@@ -7,5 +7,6 @@ func RegisterRoutes(router *gin.Engine) {
 	router.GET("/", HealthCheck)
 
 	router.POST("/tasks", CreateTask)
+	router.GET("/tasks", GetTasks)
 
 }

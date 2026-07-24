@@ -50,6 +50,32 @@ func CreateTask(c *gin.Context) {
 }
 
 func GetTasks(c *gin.Context) {
+
 	var tasks []models.Task
-	
+
+	result := database.DB.Find(&tasks)
+
+	if result.Error != nil {
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": result.Error.Error(),
+		})
+
+		return
+	}
+
+	responses := []TaskResponse{}
+
+	for _, task := range tasks {
+
+		responses = append(responses, TaskResponse{
+			ID:     task.ID,
+			Name:   task.Name,
+			Status: task.Status,
+		})
+
+	}
+
+	c.JSON(http.StatusOK, responses)
+
 }
