@@ -8,5 +8,5 @@ func RegisterRoutes(router *gin.Engine) {
 
 	router.POST("/tasks", CreateTask)
 	router.GET("/tasks", GetTasks)
-
+	router.GET("/tasks/:id", GetTaskByID)
 }

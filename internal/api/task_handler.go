@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	database "github.com/Shauryan10/GoFlow/internal/databases"
 	"github.com/Shauryan10/GoFlow/internal/models"
@@ -78,4 +79,41 @@ func GetTasks(c *gin.Context) {
 
 	c.JSON(http.StatusOK, responses)
 
+}
+
+func GetTaskByID(c *gin.Context) {
+
+	id := c.Param("id")
+
+	taskID, err := strconv.Atoi(id)
+
+	if err != nil {
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid task ID",
+		})
+
+		return
+	}
+
+	var task models.Task
+
+	result := database.DB.First(&task, taskID)
+
+	if result.Error != nil {
+
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Task not found",
+		})
+
+		return
+	}
+
+	response := TaskResponse{
+		ID:     task.ID,
+		Name:   task.Name,
+		Status: task.Status,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
