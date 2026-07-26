@@ -10,4 +10,5 @@ func RegisterRoutes(router *gin.Engine) {
 	router.GET("/tasks", GetTasks)
 	router.GET("/tasks/:id", GetTaskByID)
 	router.PUT("/tasks/:id", UpdateTask)
+	router.DELETE("/tasks/:id", DeleteTask)
 }

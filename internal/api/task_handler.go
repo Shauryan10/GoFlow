@@ -171,3 +171,36 @@ func UpdateTask(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response)
 }
+
+func DeleteTask(c *gin.Context) {
+
+	id := c.Param("id")
+
+	taskID, err := strconv.Atoi(id)
+
+	if err != nil {
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid task ID",
+		})
+		return
+	}
+
+	var task models.Task
+
+	result := database.DB.First(&task, taskID)
+
+	if result.Error != nil {
+
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Task not found",
+		})
+		return
+	}
+
+	database.DB.Delete(&task)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Task deleted successfully",
+	})
+}
