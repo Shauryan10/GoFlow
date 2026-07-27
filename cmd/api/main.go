@@ -7,6 +7,7 @@ import (
 	"github.com/Shauryan10/GoFlow/internal/api"
 	database "github.com/Shauryan10/GoFlow/internal/databases"
 	"github.com/Shauryan10/GoFlow/internal/queue"
+	"github.com/Shauryan10/GoFlow/internal/worker"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,6 +22,8 @@ func main() {
 	database.ConnectDatabase(cfg) //connecting to postgres
 
 	queue.InitQueue(100)
+
+	worker.StartWorkerPool(3)
 
 	router := gin.Default() //creating gin router
 
