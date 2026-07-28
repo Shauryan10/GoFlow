@@ -1,12 +1,12 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
 	database "github.com/Shauryan10/GoFlow/internal/databases"
 	"github.com/Shauryan10/GoFlow/internal/models"
+	"github.com/Shauryan10/GoFlow/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,29 +15,18 @@ func CreateTask(c *gin.Context) {
 	var req CreateTaskRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		fmt.Println(err)
-
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	fmt.Println("Received:", req.Name)
+	task, err := service.CreateTask(req.Name)
 
-	task := models.Task{
-		Name:   req.Name,
-		Status: "PENDING",
-	}
-
-	result := database.DB.Create(&task)
-
-	if result.Error != nil {
-
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": result.Error.Error(),
+			"error": err.Error(),
 		})
-
 		return
 	}
 
