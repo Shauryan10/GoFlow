@@ -9,9 +9,17 @@ import (
 )
 
 func StartWorker(id int) {
+
 	for {
 
 		task := <-queue.TaskQueue
+
+		mu.Lock()
+
+		Workers[id].Status = "BUSY"
+		Workers[id].CurrentTaskID = task.ID
+
+		mu.Unlock()
 
 		fmt.Printf(
 			"Worker %d started task %d (%s)\n",
@@ -25,21 +33,35 @@ func StartWorker(id int) {
 		err := service.CompleteTask(task.ID)
 
 		if err != nil {
+
 			fmt.Printf(
-				"Worker %d failed updating task %d: %v\n",
+				"Worker %d failed task %d : %v\n",
 				id,
 				task.ID,
 				err,
 			)
+
+			mu.Lock()
+
+			Workers[id].Status = "IDLE"
+			Workers[id].CurrentTaskID = 0
+
+			mu.Unlock()
+
 			continue
 		}
-		
+
+		mu.Lock()
+
+		Workers[id].Status = "IDLE"
+		Workers[id].CurrentTaskID = 0
+
+		mu.Unlock()
+
 		fmt.Printf(
 			"Worker %d completed task %d\n",
 			id,
 			task.ID,
 		)
-
 	}
-
 }
