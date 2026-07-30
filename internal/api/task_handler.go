@@ -7,6 +7,7 @@ import (
 	database "github.com/Shauryan10/GoFlow/internal/databases"
 	"github.com/Shauryan10/GoFlow/internal/models"
 	"github.com/Shauryan10/GoFlow/internal/service"
+	"github.com/Shauryan10/GoFlow/internal/worker"
 	"github.com/gin-gonic/gin"
 )
 
@@ -192,4 +193,12 @@ func DeleteTask(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Task deleted successfully",
 	})
+}
+
+func GetWorkers(c *gin.Context) {
+
+	workers := worker.GetWorkers()
+
+	c.JSON(http.StatusOK, workers)
+
 }

@@ -11,3 +11,17 @@ var (
 
 	mu sync.RWMutex
 )
+
+func GetWorkers() []*models.Worker {
+
+	mu.RLock()
+	defer mu.RUnlock()
+
+	workers := make([]*models.Worker, 0, len(Workers))
+
+	for _, worker := range Workers {
+		workers = append(workers, worker)
+	}
+
+	return workers
+}

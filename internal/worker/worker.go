@@ -28,7 +28,7 @@ func StartWorker(id int) {
 			task.Name,
 		)
 
-		time.Sleep(5 * time.Second)
+		time.Sleep(20 * time.Second)
 
 		err := service.CompleteTask(task.ID)
 
