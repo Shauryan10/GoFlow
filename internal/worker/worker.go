@@ -14,6 +14,20 @@ func StartWorker(id int) {
 
 		task := <-queue.TaskQueue
 
+		err := service.StartTask(task.ID)
+
+		if err != nil {
+
+			fmt.Printf(
+				"Worker %d failed starting task %d : %v\n",
+				id,
+				task.ID,
+				err,
+			)
+
+			continue
+		}
+
 		mu.Lock()
 
 		Workers[id].Status = "BUSY"
@@ -28,9 +42,28 @@ func StartWorker(id int) {
 			task.Name,
 		)
 
-		time.Sleep(20 * time.Second)
+		for progress := uint(10); progress <= 100; progress += 10 {
 
-		err := service.CompleteTask(task.ID)
+			err := service.UpdateTaskProgress(task.ID, progress)
+
+			if err != nil {
+
+				fmt.Printf("Failed updating progress\n")
+
+				break
+			}
+
+			fmt.Printf(
+				"Worker %d | Task %d | %d%% complete\n",
+				id,
+				task.ID,
+				progress,
+			)
+
+			time.Sleep(500 * time.Millisecond)
+		}
+
+		err = service.CompleteTask(task.ID)
 
 		if err != nil {
 

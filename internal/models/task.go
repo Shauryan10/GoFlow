@@ -6,6 +6,7 @@ type Task struct {
 	ID          uint   `gorm:"primaryKey"`
 	Name        string `gorm:"not null"`
 	Status      string `gorm:"default:PENDING"`
+	Progress    uint   `gorm:"default:0"`
 	Result      string
 	Error       string
 	CreatedAt   time.Time

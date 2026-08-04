@@ -1,6 +1,8 @@
 package service
 
 import (
+	"time"
+
 	database "github.com/Shauryan10/GoFlow/internal/databases"
 	"github.com/Shauryan10/GoFlow/internal/models"
 	"github.com/Shauryan10/GoFlow/internal/queue"
@@ -36,6 +38,56 @@ func CompleteTask(taskID uint) error {
 	}
 
 	task.Status = "COMPLETED"
+	
+	task.Progress = 100
+
+	now := time.Now()
+
+	task.CompletedAt = &now
+
+	task.Result = "Task processed successfully"
+
+	result = database.DB.Save(&task)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func StartTask(taskID uint) error {
+
+	var task models.Task
+
+	result := database.DB.First(&task, taskID)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	task.Status = "RUNNING"
+
+	result = database.DB.Save(&task)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func UpdateTaskProgress(taskID uint, progress uint) error {
+
+	var task models.Task
+
+	result := database.DB.First(&task, taskID)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	task.Progress = progress
 
 	result = database.DB.Save(&task)
 
