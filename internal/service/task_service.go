@@ -38,7 +38,7 @@ func CompleteTask(taskID uint) error {
 	}
 
 	task.Status = "COMPLETED"
-	
+
 	task.Progress = 100
 
 	now := time.Now()
@@ -96,4 +96,34 @@ func UpdateTaskProgress(taskID uint, progress uint) error {
 	}
 
 	return nil
+}
+
+func IncrementRetry(taskID uint) error {
+
+	var task models.Task
+
+	if err := database.DB.First(&task, taskID).Error; err != nil {
+		return err
+	}
+
+	task.RetryCount++
+
+	return database.DB.Save(&task).Error
+}
+
+func FailTask(taskID uint, message string) error {
+
+	var task models.Task
+
+	if err := database.DB.First(&task, taskID).Error; err != nil {
+		return err
+	}
+
+	now := time.Now()
+
+	task.Status = "FAILED"
+	task.Error = message
+	task.CompletedAt = &now
+
+	return database.DB.Save(&task).Error
 }

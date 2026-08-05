@@ -2,6 +2,7 @@ package worker
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/Shauryan10/GoFlow/internal/queue"
@@ -59,6 +60,17 @@ func StartWorker(id int) {
 				task.ID,
 				progress,
 			)
+			if rand.Intn(100) < 20 {
+
+				fmt.Printf(
+					"Worker %d | Task %d failed at %d%%\n",
+					id,
+					task.ID,
+					progress,
+				)
+
+				break
+			}
 
 			time.Sleep(500 * time.Millisecond)
 		}
