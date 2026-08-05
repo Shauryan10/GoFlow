@@ -9,6 +9,8 @@ import (
 	"github.com/Shauryan10/GoFlow/internal/service"
 )
 
+const MaxRetries = 3
+
 func StartWorker(id int) {
 
 	for {
@@ -43,57 +45,103 @@ func StartWorker(id int) {
 			task.Name,
 		)
 
-		for progress := uint(10); progress <= 100; progress += 10 {
+		success := false
 
-			err := service.UpdateTaskProgress(task.ID, progress)
-
-			if err != nil {
-
-				fmt.Printf("Failed updating progress\n")
-
-				break
-			}
+		for attempt := 1; attempt <= MaxRetries; attempt++ {
 
 			fmt.Printf(
-				"Worker %d | Task %d | %d%% complete\n",
+				"Worker %d | Starting Attempt %d for Task %d\n",
 				id,
+				attempt,
 				task.ID,
-				progress,
 			)
-			if rand.Intn(100) < 20 {
+
+			// Reset progress for this attempt
+			service.UpdateTaskProgress(task.ID, 0)
+
+			failed := false
+
+			for progress := uint(10); progress <= 100; progress += 10 {
+
+				err := service.UpdateTaskProgress(task.ID, progress)
+
+				if err != nil {
+					fmt.Println(err)
+					failed = true
+					break
+				}
 
 				fmt.Printf(
-					"Worker %d | Task %d failed at %d%%\n",
+					"Worker %d | Task %d | %d%% complete\n",
 					id,
 					task.ID,
 					progress,
 				)
 
+				time.Sleep(500 * time.Millisecond)
+
+				// 20% chance of failure
+				if rand.Intn(100) < 20 {
+
+					fmt.Printf(
+						"Worker %d | Task %d failed at %d%%\n",
+						id,
+						task.ID,
+						progress,
+					)
+
+					service.IncrementRetry(task.ID)
+
+					failed = true
+
+					break
+				}
+			}
+
+			if !failed {
+
+				success = true
+
 				break
 			}
 
-			time.Sleep(500 * time.Millisecond)
-		}
-
-		err = service.CompleteTask(task.ID)
-
-		if err != nil {
-
 			fmt.Printf(
-				"Worker %d failed task %d : %v\n",
-				id,
+				"Retrying Task %d...\n",
 				task.ID,
-				err,
 			)
 
-			mu.Lock()
+			time.Sleep(1 * time.Second)
+		}
 
-			Workers[id].Status = "IDLE"
-			Workers[id].CurrentTaskID = 0
+		if success {
 
-			mu.Unlock()
+			err = service.CompleteTask(task.ID)
 
-			continue
+			if err != nil {
+
+				fmt.Println(err)
+
+			} else {
+
+				fmt.Printf(
+					"Worker %d completed task %d\n",
+					id,
+					task.ID,
+				)
+			}
+
+		} else {
+
+			service.FailTask(
+				task.ID,
+				"Maximum retry limit exceeded",
+			)
+
+			fmt.Printf(
+				"Worker %d permanently failed task %d\n",
+				id,
+				task.ID,
+			)
 		}
 
 		mu.Lock()
