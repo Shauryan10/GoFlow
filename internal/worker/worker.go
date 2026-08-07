@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/Shauryan10/GoFlow/internal/metrics"
 	"github.com/Shauryan10/GoFlow/internal/queue"
 	"github.com/Shauryan10/GoFlow/internal/service"
 )
@@ -16,6 +17,7 @@ func StartWorker(id int) {
 	for {
 
 		task := <-queue.TaskQueue
+		metrics.QueueLength.Set(float64(len(queue.TaskQueue)))
 
 		err := service.StartTask(task.ID)
 
@@ -34,6 +36,7 @@ func StartWorker(id int) {
 		mu.Lock()
 
 		Workers[id].Status = "BUSY"
+		metrics.WorkersBusy.Inc()
 		Workers[id].CurrentTaskID = task.ID
 
 		mu.Unlock()
@@ -91,6 +94,7 @@ func StartWorker(id int) {
 					)
 
 					service.IncrementRetry(task.ID)
+					metrics.TaskRetries.Inc()
 
 					failed = true
 
@@ -116,6 +120,7 @@ func StartWorker(id int) {
 		if success {
 
 			err = service.CompleteTask(task.ID)
+			metrics.TasksProcessed.Inc()
 
 			if err != nil {
 
@@ -137,6 +142,8 @@ func StartWorker(id int) {
 				"Maximum retry limit exceeded",
 			)
 
+			metrics.TasksFailed.Inc()
+
 			fmt.Printf(
 				"Worker %d permanently failed task %d\n",
 				id,
@@ -147,6 +154,7 @@ func StartWorker(id int) {
 		mu.Lock()
 
 		Workers[id].Status = "IDLE"
+		metrics.WorkersBusy.Dec()
 		Workers[id].CurrentTaskID = 0
 
 		mu.Unlock()

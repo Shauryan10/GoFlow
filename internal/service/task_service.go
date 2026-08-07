@@ -4,6 +4,7 @@ import (
 	"time"
 
 	database "github.com/Shauryan10/GoFlow/internal/databases"
+	"github.com/Shauryan10/GoFlow/internal/metrics"
 	"github.com/Shauryan10/GoFlow/internal/models"
 	"github.com/Shauryan10/GoFlow/internal/queue"
 )
@@ -23,7 +24,8 @@ func CreateTask(name string) (*models.Task, error) {
 
 	// Send task to worker queue
 	queue.TaskQueue <- task
-
+	metrics.QueueLength.Set(float64(len(queue.TaskQueue)))
+	
 	return &task, nil
 }
 
