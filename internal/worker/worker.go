@@ -36,11 +36,12 @@ func StartWorker(id int) {
 		mu.Lock()
 
 		Workers[id].Status = "BUSY"
-		metrics.WorkersBusy.Inc()
+
 		Workers[id].CurrentTaskID = task.ID
 
 		mu.Unlock()
 
+		metrics.WorkersBusy.Inc()   //increae by 1
 		fmt.Printf(
 			"Worker %d started task %d (%s)\n",
 			id,
@@ -120,7 +121,6 @@ func StartWorker(id int) {
 		if success {
 
 			err = service.CompleteTask(task.ID)
-			metrics.TasksProcessed.Inc()
 
 			if err != nil {
 
@@ -128,6 +128,7 @@ func StartWorker(id int) {
 
 			} else {
 
+				metrics.TasksProcessed.Inc()
 				fmt.Printf(
 					"Worker %d completed task %d\n",
 					id,
@@ -154,11 +155,11 @@ func StartWorker(id int) {
 		mu.Lock()
 
 		Workers[id].Status = "IDLE"
-		metrics.WorkersBusy.Dec()
 		Workers[id].CurrentTaskID = 0
 
 		mu.Unlock()
 
+		metrics.WorkersBusy.Dec()   // decrease by 1
 		fmt.Printf(
 			"Worker %d completed task %d\n",
 			id,
