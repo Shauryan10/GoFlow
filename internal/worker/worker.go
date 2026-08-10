@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Shauryan10/GoFlow/internal/metrics"
+	"github.com/Shauryan10/GoFlow/internal/models"
 	"github.com/Shauryan10/GoFlow/internal/queue"
 	"github.com/Shauryan10/GoFlow/internal/service"
 )
@@ -15,12 +16,28 @@ const MaxRetries = 3
 
 func StartWorker(ctx context.Context, id int) {
 
+	// Make sure this worker exists in the registry.
+	mu.Lock()
+
+	if Workers[id] == nil {
+		Workers[id] = &models.Worker{
+			ID:            id,
+			Status:        "IDLE",
+			CurrentTaskID: 0,
+		}
+	}
+
+	mu.Unlock()
+
 	for {
 
 		select {
 
 		case task := <-queue.TaskQueue:
-			metrics.QueueLength.Set(float64(len(queue.TaskQueue)))
+
+			metrics.QueueLength.Set(
+				float64(len(queue.TaskQueue)),
+			)
 
 			err := service.StartTask(task.ID)
 
@@ -36,15 +53,16 @@ func StartWorker(ctx context.Context, id int) {
 				continue
 			}
 
+			// Worker becomes BUSY
 			mu.Lock()
 
 			Workers[id].Status = "BUSY"
-
 			Workers[id].CurrentTaskID = task.ID
 
 			mu.Unlock()
 
-			metrics.WorkersBusy.Inc() //increae by 1
+			metrics.WorkersBusy.Inc()
+
 			fmt.Printf(
 				"Worker %d started task %d (%s)\n",
 				id,
@@ -54,6 +72,7 @@ func StartWorker(ctx context.Context, id int) {
 
 			success := false
 
+			// Retry loop
 			for attempt := 1; attempt <= MaxRetries; attempt++ {
 
 				fmt.Printf(
@@ -63,17 +82,40 @@ func StartWorker(ctx context.Context, id int) {
 					task.ID,
 				)
 
-				// Reset progress for this attempt
-				service.UpdateTaskProgress(task.ID, 0)
+				err = service.UpdateTaskProgress(
+					task.ID,
+					0,
+				)
+
+				if err != nil {
+
+					fmt.Printf(
+						"Failed resetting progress for task %d: %v\n",
+						task.ID,
+						err,
+					)
+
+					break
+				}
 
 				failed := false
 
+				// Progress loop
 				for progress := uint(10); progress <= 100; progress += 10 {
 
-					err := service.UpdateTaskProgress(task.ID, progress)
+					err := service.UpdateTaskProgress(
+						task.ID,
+						progress,
+					)
 
 					if err != nil {
-						fmt.Println(err)
+
+						fmt.Printf(
+							"Failed updating progress for task %d: %v\n",
+							task.ID,
+							err,
+						)
+
 						failed = true
 						break
 					}
@@ -98,6 +140,7 @@ func StartWorker(ctx context.Context, id int) {
 						)
 
 						service.IncrementRetry(task.ID)
+
 						metrics.TaskRetries.Inc()
 
 						failed = true
@@ -109,7 +152,6 @@ func StartWorker(ctx context.Context, id int) {
 				if !failed {
 
 					success = true
-
 					break
 				}
 
@@ -121,17 +163,24 @@ func StartWorker(ctx context.Context, id int) {
 				time.Sleep(1 * time.Second)
 			}
 
+			// Task completed successfully
 			if success {
 
 				err = service.CompleteTask(task.ID)
 
 				if err != nil {
 
-					fmt.Println(err)
+					fmt.Printf(
+						"Worker %d failed completing task %d: %v\n",
+						id,
+						task.ID,
+						err,
+					)
 
 				} else {
 
 					metrics.TasksProcessed.Inc()
+
 					fmt.Printf(
 						"Worker %d completed task %d\n",
 						id,
@@ -141,10 +190,21 @@ func StartWorker(ctx context.Context, id int) {
 
 			} else {
 
-				service.FailTask(
+				// Task permanently failed
+				err = service.FailTask(
 					task.ID,
 					"Maximum retry limit exceeded",
 				)
+
+				if err != nil {
+
+					fmt.Printf(
+						"Worker %d failed updating failed task %d: %v\n",
+						id,
+						task.ID,
+						err,
+					)
+				}
 
 				metrics.TasksFailed.Inc()
 
@@ -155,6 +215,7 @@ func StartWorker(ctx context.Context, id int) {
 				)
 			}
 
+			// Worker becomes IDLE
 			mu.Lock()
 
 			Workers[id].Status = "IDLE"
@@ -162,14 +223,15 @@ func StartWorker(ctx context.Context, id int) {
 
 			mu.Unlock()
 
-			metrics.WorkersBusy.Dec() // decrease by 1
-			fmt.Printf(
-				"Worker %d completed task %d\n",
-				id,
-				task.ID,
-			)
+			metrics.WorkersBusy.Dec()
+
 		case <-ctx.Done():
-			fmt.Printf("Worker %d Shutting Down\n", id)
+
+			fmt.Printf(
+				"Worker %d shutting down\n",
+				id,
+			)
+
 			return
 		}
 	}

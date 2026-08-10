@@ -1,27 +1,39 @@
 package worker
 
 import (
+	"context"
 	"fmt"
-
-	"github.com/Shauryan10/GoFlow/internal/models"
+	"sync"
 )
 
-func StartWorkerPool(workerCount int) {
+func StartWorkerPool(
+	ctx context.Context,
+	count int,
+	wg *sync.WaitGroup,
+) {
 
-	for i := 1; i <= workerCount; i++ {
+	for i := 1; i <= count; i++ {
 
-		mu.Lock()
+		wg.Add(1)
 
-		Workers[i] = &models.Worker{
-			ID:            i,
-			Status:        "IDLE",
-			CurrentTaskID: 0,
-		}
+		workerID := i
 
-		mu.Unlock()
+		go func() {
 
-		go StartWorker(i)
+			defer wg.Done()
 
-		fmt.Printf("Worker %d started\n", i)
+			fmt.Printf(
+				"Worker %d started\n",
+				workerID,
+			)
+
+			StartWorker(ctx, workerID)
+
+			fmt.Printf(
+				"Worker %d stopped\n",
+				workerID,
+			)
+
+		}()
 	}
 }
