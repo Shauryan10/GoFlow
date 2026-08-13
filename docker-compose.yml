@@ -1,22 +1,31 @@
-version: "3.9"
-
 services:
+
   postgres:
-    image: postgres:17
+    image: postgres:16
     container_name: goflow-postgres
-
-    restart: unless-stopped
-
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: goflow
-
     ports:
       - "5432:5432"
-
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
+
+  goflow:
+    image: goflow:latest
+    container_name: goflow-app
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: goflow
+      APP_PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
 
 volumes:
-  postgres_data:
+  postgres-data:
