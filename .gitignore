@@ -1,4 +1,11 @@
 .env
+*.log
+
+bin/
+dist/
+
+.DS_Store
+
 .idea
 tmp
 bin
