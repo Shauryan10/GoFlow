@@ -3,6 +3,7 @@ package worker
 import (
 	"context"
 	"fmt"
+	"log"
 	"math/rand"
 	"time"
 
@@ -139,7 +140,9 @@ func StartWorker(ctx context.Context, id int) {
 							progress,
 						)
 
-						service.IncrementRetry(task.ID)
+						if err := service.IncrementRetry(task.ID); err != nil {
+							log.Printf("Failed to increment retry count for task %d: %v", task.ID, err)
+						}
 
 						metrics.TaskRetries.Inc()
 
