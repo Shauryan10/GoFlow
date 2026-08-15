@@ -8,11 +8,11 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o goflow ./cmd/api
+RUN CGO_ENABLED=0 go build -o goflow ./cmd/api
 
 
 # ---------- Stage 2: Run ----------
-FROM debian:bookworm-slim
+FROM gcr.io/distroless/static-debian13:nonroot
 
 WORKDIR /app
 
@@ -20,4 +20,6 @@ COPY --from=builder /app/goflow .
 
 EXPOSE 8080
 
-CMD ["./goflow"]
+USER nonroot:nonroot
+
+ENTRYPOINT ["./goflow"]
