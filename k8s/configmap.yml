@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: goflow-config
+  namespace: goflow
+data:
+  DB_HOST: "host.docker.internal"
+  DB_PORT: "5432"
+  DB_NAME: "goflow"
+  APP_PORT: "8080"
