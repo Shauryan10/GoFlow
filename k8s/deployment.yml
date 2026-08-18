@@ -16,6 +16,7 @@ spec:
         app: goflow
 
     spec:
+      serviceAccountName: goflow
       automountServiceAccountToken: false
 
       securityContext:
@@ -33,6 +34,9 @@ spec:
             runAsNonRoot: true
             runAsUser: 10001
             runAsGroup: 10001
+
+            readOnlyRootFilesystem: true
+
             capabilities:
               drop:
                 - ALL

@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: goflow-network-policy
+  namespace: goflow
+
+spec:
+  podSelector:
+    matchLabels:
+      app: goflow
+
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    # Allow HTTP traffic to GoFlow
+    - ports:
+        - protocol: TCP
+          port: 8080
+
+  egress:
+    # Allow DNS resolution
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+    # Allow PostgreSQL connection
+    - ports:
+        - protocol: TCP
+          port: 5432
