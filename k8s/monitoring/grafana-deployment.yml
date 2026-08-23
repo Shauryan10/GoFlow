@@ -38,3 +38,12 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+
+          volumeMounts:
+            - name: grafana-storage
+              mountPath: /var/lib/grafana
+
+      volumes:
+        - name: grafana-storage
+          persistentVolumeClaim:
+              claimName: grafana-storage
