@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: grafana
   namespace: goflow
+
 spec:
   replicas: 1
 
@@ -40,10 +41,32 @@ spec:
               memory: 512Mi
 
           volumeMounts:
+
+            # Existing persistent Grafana storage
             - name: grafana-storage
               mountPath: /var/lib/grafana
 
+            # Dashboard JSON
+            - name: grafana-dashboard
+              mountPath: /var/lib/grafana/dashboards
+
+            # Dashboard provisioning configuration
+            - name: grafana-dashboard-provider
+              mountPath: /etc/grafana/provisioning/dashboards
+
       volumes:
+
+        # Existing PVC — DO NOT REMOVE
         - name: grafana-storage
           persistentVolumeClaim:
-              claimName: grafana-storage
+            claimName: grafana-storage
+
+        # Dashboard ConfigMap
+        - name: grafana-dashboard
+          configMap:
+            name: goflow-grafana-dashboard
+
+        # Provider ConfigMap
+        - name: grafana-dashboard-provider
+          configMap:
+            name: grafana-dashboard-provider
