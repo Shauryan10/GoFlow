@@ -54,7 +54,7 @@ groups:
         for: 1m
         isPaused: false
         notification_settings:
-          receiver: empty
+          receiver: GoFlow Email
       - uid: ffw5w7ehnjv9cf
         title: GoFlow - Task Failures
         condition: C
@@ -104,7 +104,7 @@ groups:
         for: 1m
         isPaused: false
         notification_settings:
-          receiver: empty
+          receiver: GoFlow Email
       - uid: bfw5wctbyfabkc
         title: GoFlow - Retry Storm
         condition: C
@@ -154,7 +154,7 @@ groups:
         for: 1m
         isPaused: false
         notification_settings:
-          receiver: empty
+          receiver: GoFlow Email
       - uid: efw5wgco32yv4b
         title: GoFlow - Worker Saturation
         condition: C
@@ -204,7 +204,7 @@ groups:
         for: 1m
         isPaused: false
         notification_settings:
-          receiver: empty
+          receiver: GoFlow Email
       - uid: ffw5wks10do8wc
         title: GoFlow - High CPU
         condition: C
@@ -254,7 +254,7 @@ groups:
         for: 5m
         isPaused: false
         notification_settings:
-          receiver: empty
+          receiver: GoFlow Email
       - uid: dfw5wpqckffgge
         title: GoFlow - High Memory
         condition: C
@@ -304,4 +304,4 @@ groups:
         for: 1m
         isPaused: false
         notification_settings:
-          receiver: empty
+          receiver: GoFlow Email

@@ -1,0 +1,10 @@
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: GoFlow Email
+    receivers:
+      - uid: goflow-email
+        type: email
+        settings:
+          addresses: "shindhushauryan@gmail.com"
