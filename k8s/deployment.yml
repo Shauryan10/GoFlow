@@ -54,6 +54,15 @@ spec:
             timeoutSeconds: 2
             failureThreshold: 3
 
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+
           envFrom:
             - configMapRef:
                 name: goflow-config
