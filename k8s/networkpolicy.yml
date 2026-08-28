@@ -14,12 +14,18 @@ spec:
     - Egress
 
   ingress:
-    # Allow HTTP traffic to GoFlow
-    - ports:
+
+    # Allow Prometheus to scrape GoFlow metrics
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
         - protocol: TCP
           port: 8080
 
   egress:
+
     # Allow DNS resolution
     - ports:
         - protocol: UDP
@@ -27,7 +33,7 @@ spec:
         - protocol: TCP
           port: 53
 
-    # Allow PostgreSQL connection
+    # PostgreSQL
     - ports:
         - protocol: TCP
           port: 5432
