@@ -5,7 +5,7 @@ services:
     container_name: goflow-postgres
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: goflow
     ports:
       - "5432:5432"
@@ -19,7 +19,7 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: postgres
-      DB_PASSWORD: postgres
+      DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: goflow
       APP_PORT: 8080
     ports:
