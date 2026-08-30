@@ -27,7 +27,7 @@ spec:
         - name: goflow
 
           image: ghcr.io/shauryan10/goflow:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
 
           securityContext:
             allowPrivilegeEscalation: false
