@@ -9,3 +9,10 @@ dist/
 .idea
 tmp
 bin
+
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/terraform.tfvars
+terraform/.terraform.lock.hcl
