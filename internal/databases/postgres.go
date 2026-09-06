@@ -15,7 +15,7 @@ var DB *gorm.DB
 func ConnectDatabase(cfg *config.Config) {
 
 	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=require",
 		cfg.DBHost,
 		cfg.DBUser,
 		cfg.DBPassword,
