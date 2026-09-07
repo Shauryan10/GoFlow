@@ -26,7 +26,7 @@ spec:
       containers:
         - name: goflow
 
-          image: ghcr.io/shauryan10/goflow:f19a054d4fa1004f4d8457cb10e375eb55437e8f
+          image: ghcr.io/shauryan10/goflow:1c5f7fa004cb56961ddacad48ac4d7a1a5be8fb3
           imagePullPolicy: IfNotPresent
 
           securityContext:
