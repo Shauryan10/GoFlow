@@ -8,7 +8,7 @@ spec:
 
   source:
     repoURL: https://github.com/Shauryan10/GoFlow.git
-    targetRevision: main
+    targetRevision: 52c0946e86c33e8dd9b62a46125c6d4496f575a5
     path: k8s
 
   destination:
