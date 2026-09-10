@@ -48,12 +48,12 @@ resource "aws_db_instance" "goflow" {
   port     = 5432
 
   vpc_security_group_ids = [aws_security_group.goflow_rds.id]
-  
+
   publicly_accessible = true
 
   backup_retention_period = 1
-  deletion_protection    = false
-  skip_final_snapshot    = true
+  deletion_protection     = false
+  skip_final_snapshot     = true
 
   auto_minor_version_upgrade = true
 
