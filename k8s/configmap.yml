@@ -4,7 +4,8 @@ metadata:
   name: goflow-config
   namespace: goflow
 data:
-  DB_HOST: "goflow-postgres.cjm4ysissldg.ap-south-1.rds.amazonaws.com"
-  DB_PORT: "5432"
-  DB_NAME: "goflow"
   APP_PORT: "8080"
+  DB_HOST: goflow-postgres.cjm4ysissldg.ap-south-1.rds.amazonaws.com
+  DB_PORT: "5432"
+  DB_NAME: goflow
+  DB_SSLMODE: require
