@@ -13,10 +13,6 @@ output "rds_database_name" {
   value       = aws_db_instance.goflow.db_name
 }
 
-output "goflow_monitoring_role_arn" {
-  description = "ARN of the GoFlow CloudWatch monitoring IAM role"
-  value       = aws_iam_role.goflow_monitoring.arn
-}
 
 output "goflow_monitoring_policy_arn" {
   description = "ARN of the GoFlow CloudWatch read-only policy"
