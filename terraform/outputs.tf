@@ -14,6 +14,16 @@ output "rds_database_name" {
 }
 
 
+output "goflow_monitoring_user_arn" {
+  description = "ARN of the GoFlow monitoring IAM user"
+  value       = aws_iam_user.goflow_monitoring_user.arn
+}
+
+output "goflow_monitoring_role_arn" {
+  description = "ARN of the GoFlow CloudWatch monitoring IAM role"
+  value       = aws_iam_role.goflow_monitoring.arn
+}
+
 output "goflow_monitoring_policy_arn" {
   description = "ARN of the GoFlow CloudWatch read-only policy"
   value       = aws_iam_policy.goflow_cloudwatch_read.arn
