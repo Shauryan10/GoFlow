@@ -120,3 +120,61 @@ resource "aws_cloudwatch_metric_alarm" "goflow_rds_memory" {
   }
 }
 
+
+resource "aws_cloudwatch_metric_alarm" "goflow_rds_read_latency" {
+  alarm_name        = "GoFlow-RDS-High-Read-Latency"
+  alarm_description = "Triggers when GoFlow RDS read latency exceeds 100 ms"
+
+  namespace           = "AWS/RDS"
+  metric_name         = "ReadLatency"
+  comparison_operator = "GreaterThanThreshold"
+
+  evaluation_periods = 2
+  period             = 300
+  statistic          = "Average"
+  threshold          = 0.1
+
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.goflow.identifier
+  }
+
+  alarm_actions = [
+    data.aws_sns_topic.goflow_alerts.arn
+  ]
+
+  treat_missing_data = "notBreaching"
+
+  tags = {
+    Project   = "GoFlow"
+    ManagedBy = "Terraform"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "goflow_rds_write_latency" {
+  alarm_name        = "GoFlow-RDS-High-Write-Latency"
+  alarm_description = "Triggers when GoFlow RDS write latency exceeds 100 ms"
+
+  namespace           = "AWS/RDS"
+  metric_name         = "WriteLatency"
+  comparison_operator = "GreaterThanThreshold"
+
+  evaluation_periods = 2
+  period             = 300
+  statistic          = "Average"
+  threshold          = 0.1
+
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.goflow.identifier
+  }
+
+  alarm_actions = [
+    data.aws_sns_topic.goflow_alerts.arn
+  ]
+
+  treat_missing_data = "notBreaching"
+
+  tags = {
+    Project   = "GoFlow"
+    ManagedBy = "Terraform"
+  }
+}
